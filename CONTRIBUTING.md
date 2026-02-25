@@ -39,43 +39,43 @@ This reverts commit <hash>.
 ## Type
 
 Must be one of:
-feat:     A new feature
-fix:      A bug fix
-refactor: Code change without feature or bug fix
-perf:     Performance improvement
-test:     Add or update tests
-docs:     Documentation-only changes
-style:    Formatting only (no logic changes)
-chore:    Tooling, build, or dependency changes
-ci:       CI/CD workflow changes
+* feat:     A new feature
+* fix:      A bug fix
+* refactor: Code change without feature or bug fix
+* perf:     Performance improvement
+* test:     Add or update tests
+* docs:     Documentation-only changes
+* style:    Formatting only (no logic changes)
+* chore:    Tooling, build, or dependency changes
+* ci:       CI/CD workflow changes
 
 ## Scope
 
 Scope describes the subsystem affected.
 
 Approved scopes for kittybot:
-head        High-level robot head service
-tracking    PTZ math and control logic
-state       State machine
-vision      Camera and perception
-transport   PTZ/EYES/STATE protocol and transport
-ai          Prometheus AI integration
-api         FastAPI endpoints
-config      Runtime configuration
-firmware    STM32 or embedded code
-hardware    BOM, wiring, CAD
-docs        Documentation updates
-repo        Repository structure changes
-ops         Docker/compose/deployment
-ci          CI workflow changes
+* head        High-level robot head service
+* tracking    PTZ math and control logic
+* state       State machine
+* vision      Camera and perception
+* transport   PTZ/EYES/STATE protocol and transport
+* ai          Prometheus AI integration
+* api         FastAPI endpoints
+* config      Runtime configuration
+* firmware    STM32 or embedded code
+* hardware    BOM, wiring, CAD
+* docs        Documentation updates
+* repo        Repository structure changes
+* ops         Docker/compose/deployment
+* ci          CI workflow changes
 
 Use lowercase.
 
 Examples:
-feat(head): add state machine integration
-feat(tracking): implement yaw clamp limits
-fix(api): enforce api key authentication
-chore(ops): add compose.server profile
+* feat(head): add state machine integration
+* feat(tracking): implement yaw clamp limits
+* fix(api): enforce api key authentication
+* chore(ops): add compose.server profile
 
 ## Subject Rules
 
