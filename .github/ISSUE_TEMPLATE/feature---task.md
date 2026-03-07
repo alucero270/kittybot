@@ -7,14 +7,6 @@ assignees: alucero270
 
 ---
 
----
-name: "Feature / Task (Codex-ready)"
-about: "A scoped task with acceptance criteria that can be pasted into Codex"
-title: "[kittybot] <short title>"
-labels: ["enhancement"]
-assignees: []
----
-
 ## Summary
 Describe what we are building in 1–3 sentences.
 
