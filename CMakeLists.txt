@@ -18,8 +18,7 @@ endif()
 # Testing
 include(CTest)
 if(BUILD_TESTING)
-  # add_subdirectory(tests) -- uncomment when tests exist (Month 1 Week 4)
+  add_subdirectory(tests)
 endif()
 
-# Modules added here as they're built (Month 1+)
-# add_subdirectory(src)
+add_subdirectory(src)

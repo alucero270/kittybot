@@ -3,7 +3,7 @@ Language: Cpp
 BasedOnStyle: Google
 
 # C++23
-Standard: c++23
+Standard: Latest
 
 # Indentation
 IndentWidth: 4
