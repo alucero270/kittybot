@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KittyBot — Phase 01 Parts &amp; Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0b;
+    --bg-elevated: #16140f;
+    --bg-card: #1a1814;
+    --grid-line: rgba(232, 159, 76, 0.04);
+    --text: #e8e4da;
+    --text-dim: #9b9486;
+    --text-faint: #5e5950;
+    --amber: #e89f4c;
+    --amber-dim: #b87a35;
+    --signal: #7ab488;
+    --rust: #c45a3d;
+    --line: rgba(232, 228, 218, 0.08);
+    --line-strong: rgba(232, 228, 218, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-weight: 300;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(232, 159, 76, 0.04) 0%, transparent 40%),
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 24px 96px;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 28px;
+    margin-bottom: 36px;
+  }
+  .meta-row {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .meta-row .status {
+    color: var(--amber);
+  }
+  .meta-row .status::before {
+    content: '●';
+    margin-right: 6px;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(1.9rem, 5.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  h1 .num { color: var(--amber); font-weight: 600; }
+  h1 .slash { color: var(--text-faint); margin: 0 0.4em; font-weight: 300; }
+  .subtitle {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-dim);
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  /* TOTALS DASHBOARD */
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin-bottom: 36px;
+  }
+  .total-cell {
+    background: var(--bg-elevated);
+    padding: 18px 20px;
+  }
+  .total-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .total-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .total-value.amber { color: var(--amber); }
+  .total-value.signal { color: var(--signal); }
+  .total-value.rust { color: var(--rust); }
+  .total-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  /* PRINCIPLE BOX */
+  .principle-box {
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--amber);
+    padding: 18px 22px;
+    margin-bottom: 36px;
+  }
+  .principle-box .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .principle-box p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  .principle-box strong {
+    color: var(--text);
+    font-weight: 500;
+    background: rgba(232, 159, 76, 0.12);
+    padding: 1px 4px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line-strong);
+    flex-wrap: wrap;
+  }
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .section-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    min-width: 180px;
+  }
+  .section-subtotal {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+  .section-subtotal .amount {
+    color: var(--amber);
+    font-weight: 500;
+  }
+
+  /* PART CARD */
+  .part {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    margin-bottom: 12px;
+    transition: border-color 0.15s, opacity 0.2s;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: stretch;
+  }
+  .part:hover { border-color: var(--line-strong); }
+  .part.purchased {
+    opacity: 0.55;
+  }
+  .part.purchased .part-name {
+    text-decoration: line-through;
+    text-decoration-color: var(--text-faint);
+    color: var(--text-faint);
+  }
+
+  .part-check {
+    padding: 18px 14px 18px 18px;
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    user-select: none;
+  }
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--text-faint);
+    margin-top: 2px;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .part-check:hover .checkbox {
+    border-color: var(--amber);
+  }
+  .part.purchased .checkbox {
+    background: var(--signal);
+    border-color: var(--signal);
+  }
+  .part.purchased .checkbox::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: var(--bg);
+    font-weight: 700;
+  }
+
+  .part-body {
+    padding: 16px 14px 16px 0;
+  }
+  .part-name {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .part-rationale {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .part-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+  }
+  .part-meta a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232, 159, 76, 0.3);
+    padding-bottom: 1px;
+    transition: border-color 0.15s;
+  }
+  .part-meta a:hover {
+    border-bottom-color: var(--amber);
+  }
+  .part-meta .qty {
+    color: var(--text-dim);
+  }
+
+  .part-price {
+    padding: 18px 22px 18px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--amber);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* WARNING BOX */
+  .warning {
+    background: rgba(196, 90, 61, 0.08);
+    border-left: 2px solid var(--rust);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .warning .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+
+  /* DEFER BOX */
+  .defer {
+    background: var(--bg-elevated);
+    border: 1px dashed var(--line-strong);
+    padding: 22px 24px;
+    margin-top: 36px;
+  }
+  .defer h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--amber);
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .defer h3::before {
+    content: '// ';
+    color: var(--text-faint);
+  }
+  .defer ul {
+    list-style: none;
+    padding: 0;
+  }
+  .defer li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .defer li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-faint);
+  }
+  .defer li strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+  .defer li .when {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78em;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+    margin-left: 8px;
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+  footer .ascii {
+    color: var(--amber-dim);
+    margin-bottom: 12px;
+    font-size: 10px;
+  }
+  footer button {
+    background: transparent;
+    border: 1px solid var(--text-faint);
+    color: var(--text-dim);
+    padding: 6px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.15s;
+  }
+  footer button:hover {
+    border-color: var(--rust);
+    color: var(--rust);
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px 16px 64px; }
+    .part { grid-template-columns: auto 1fr; }
+    .part-price { grid-column: 2; padding: 0 14px 14px; justify-content: flex-start; }
+    h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="meta-row">
+      <span>KITTYBOT // PHASE 01 // PROCUREMENT</span>
+      <span class="status">PRE-START · ORDER PENDING</span>
+    </div>
+    <h1><span class="num">P.01</span><span class="slash">/</span>PARTS &amp; TOOLS</h1>
+    <p class="subtitle">Buy this week. Optimized for "buy once, no upgrades" — cheapest <em>quality</em> version, not cheapest version. Authorized distributor for the STM32. Amazon for commodities. Pine Store direct for the soldering iron.</p>
+  </header>
+
+  <!-- TOTALS DASHBOARD -->
+  <section class="totals">
+    <div class="total-cell">
+      <div class="total-label">Hardware</div>
+      <div class="total-value amber" id="totalHardware">$0</div>
+      <div class="total-sub" id="hardwareCount">0 of 7 acquired</div>
+    </div>
+    <div class="total-cell">
+      <div class="total-label">Tools</div>
+      <div class="total-value amber" id="totalTools">$0</div>
+      <div class="total-sub" id="toolsCount">0 of 11 acquired</div>
+    </div>
+    <div class="total-cell">
+      <div class="total-label">Total Spend</div>
+      <div class="total-value signal" id="totalSpend">$0</div>
+      <div class="total-sub">est. ceiling ~$270</div>
+    </div>
+    <div class="total-cell">
+      <div class="total-label">Budget Remaining</div>
+      <div class="total-value" id="budgetRemain">$1,500</div>
+      <div class="total-sub">of $1,500 total</div>
+    </div>
+  </section>
+
+  <!-- PRINCIPLE -->
+  <section class="principle-box">
+    <div class="label">// Sourcing principle</div>
+    <p><strong>Authorized distributor</strong> (Mouser/DigiKey) for the Nucleo board — clones exist with different USB-to-serial chips and flash configs that will burn debugging hours later. <strong>Pine Store direct</strong> for the soldering iron — beats Amazon clones. <strong>Amazon</strong> is fine for commodities (jumper wires, breadboard, hookup wire) where the part is what it says it is.</p>
+  </section>
+
+  <!-- HARDWARE SECTION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 01</span>
+      <h2 class="section-title">Hardware</h2>
+      <span class="section-subtotal">subtotal <span class="amount" id="subHardware">$0</span> / ~$58</span>
+    </div>
+
+    <div class="part" data-id="h1" data-cost="15" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Nucleo-F446RE Development Board</div>
+        <div class="part-rationale">Cortex-M4 with FPU. The FPU matters when you write the Kalman filter in Month 7. Built-in ST-Link debugger. From authorized distributor only — Amazon clones will cost you weekends.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.digikey.com/en/products/detail/stmicroelectronics/NUCLEO-F446RE/5347712" target="_blank" rel="noopener">DigiKey →</a>
+          <a href="https://www.mouser.com/ProductDetail/STMicroelectronics/NUCLEO-F446RE" target="_blank" rel="noopener">Mouser →</a>
+        </div>
+      </div>
+      <div class="part-price">~$15</div>
+    </div>
+
+    <div class="part" data-id="h2" data-cost="10" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">MG90S Metal-Gear Servos (×2)</div>
+        <div class="part-rationale">Buy two. You'll burn one out learning. Metal gears outlast the SG90 plastic-gear version by enough to matter. Generic brand on Amazon is fine — these are commodity.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 2 (often sold in 4-packs)</span>
+          <a href="https://www.amazon.com/s?k=MG90S+servo+metal+gear" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$10</div>
+    </div>
+
+    <div class="part" data-id="h3" data-cost="10" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">5V 3A Wall Adapter, Barrel Jack</div>
+        <div class="part-rationale">3A, not 2A. Servos draw current spikes. <strong>Critical:</strong> never power servos from the Nucleo's 5V pin — current spikes will brown out the MCU and corrupt your firmware. Separate supply, common ground.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=5V+3A+power+supply+barrel+jack" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$10</div>
+    </div>
+
+    <div class="part" data-id="h4" data-cost="5" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Barrel Jack to Breadboard Adapter</div>
+        <div class="part-rationale">Connects the wall adapter to your breadboard's power rails. Often sold in 5-packs.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=DC+barrel+jack+breadboard+adapter" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$5</div>
+    </div>
+
+    <div class="part" data-id="h5" data-cost="5" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Half-Size Breadboard</div>
+        <div class="part-rationale">Any with a power rail strip. You'll likely buy a second one in Month 5 for the head wiring; one is enough for now.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=half+size+solderless+breadboard" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$5</div>
+    </div>
+
+    <div class="part" data-id="h6" data-cost="8" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Jumper Wire Kit (M-M, M-F, F-F)</div>
+        <div class="part-rationale">120-piece assortment. You'll use these every session for the next 18 months.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1 kit</span>
+          <a href="https://www.amazon.com/s?k=jumper+wire+kit+arduino+120" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$8</div>
+    </div>
+
+    <div class="part" data-id="h7" data-cost="5" data-cat="hardware">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Micro-USB Cable (Data-Capable)</div>
+        <div class="part-rationale">You probably own one. <strong>Verify it transfers data</strong> — many "charging cables" don't have the data lines wired. If yours doesn't enumerate the Nucleo as a USB device, this is the cause. Mark known-good cables to avoid future confusion.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=micro+usb+data+cable" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">$0–5</div>
+    </div>
+  </section>
+
+  <!-- TOOLS SECTION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 02</span>
+      <h2 class="section-title">Tools (One-Time)</h2>
+      <span class="section-subtotal">subtotal <span class="amount" id="subTools">$0</span> / ~$210</span>
+    </div>
+
+    <div class="warning">
+      <span class="label">Buy-once principle</span>The cheapest tool is the one you don't replace. Skip $15 soldering kits and $5 multimeters — they're frustrating, they lie, and you'll buy quality versions anyway. The list below is mid-range, lifetime-purchase territory.
+    </div>
+
+    <div class="part" data-id="t1" data-cost="26" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Pinecil V2 Smart Soldering Iron</div>
+        <div class="part-rationale">Best $26 in hobby electronics. Heats fast, holds temperature, USB-C PD powered. Will outlive this project. Pine64 ships from US warehouses; lead time ~1 week.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://pine64.com/product/pinecil-smart-mini-portable-soldering-iron/" target="_blank" rel="noopener">Pine Store →</a>
+        </div>
+      </div>
+      <div class="part-price">~$26</div>
+    </div>
+
+    <div class="part" data-id="t2" data-cost="15" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">USB-C PD Power Supply (65W) for Pinecil</div>
+        <div class="part-rationale">Pinecil needs USB-C PD at 65W to hit full temperature quickly. Skip if you already own a laptop charger that supports PD 65W+ (most modern ones do).</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1 (skip if owned)</span>
+          <a href="https://www.amazon.com/s?k=USB-C+PD+65W+charger" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">$0–15</div>
+    </div>
+
+    <div class="part" data-id="t3" data-cost="15" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">60/40 Leaded Solder, 0.6–0.8mm Rosin Core</div>
+        <div class="part-rationale">Easier to learn with than lead-free. Use ventilation. Kester or MG Chemicals are reliable brands. One small spool lasts most of the project.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1 spool</span>
+          <a href="https://www.amazon.com/s?k=Kester+60+40+rosin+core+0.8mm" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$15</div>
+    </div>
+
+    <div class="part" data-id="t4" data-cost="30" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Klein MM325 Multimeter (or AstroAI ~$22 budget option)</div>
+        <div class="part-rationale">Klein MM325 (~$30) is the buy-once option. AstroAI (~$22) is acceptable. <strong>Avoid sub-$15 meters</strong> — they lie about voltage and you'll debug ghost problems for weeks.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=Klein+MM325+multimeter" target="_blank" rel="noopener">Klein →</a>
+          <a href="https://www.amazon.com/s?k=AstroAI+multimeter+digital" target="_blank" rel="noopener">AstroAI →</a>
+        </div>
+      </div>
+      <div class="part-price">$22–30</div>
+    </div>
+
+    <div class="part" data-id="t5" data-cost="15" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Helping Hands with Magnifier</div>
+        <div class="part-rationale">You have two hands. Soldering needs three. Even the cheap ones work. The magnifier is more useful than you'd expect.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=helping+hands+magnifier+soldering" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$15</div>
+    </div>
+
+    <div class="part" data-id="t6" data-cost="25" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Klein 11061 Self-Adjusting Wire Strippers</div>
+        <div class="part-rationale">Cheap strippers mangle wires and waste time. Self-adjusting handles 10–24 AWG without measuring.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=Klein+11061+wire+stripper" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$25</div>
+    </div>
+
+    <div class="part" data-id="t7" data-cost="8" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Hakko CHP-170 Flush Cutters</div>
+        <div class="part-rationale">The standard. Lasts forever if you don't try to cut steel with them. For trimming component leads after soldering.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=Hakko+CHP-170" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$8</div>
+    </div>
+
+    <div class="part" data-id="t8" data-cost="35" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">iFixit Mako Precision Driver Kit (64-bit)</div>
+        <div class="part-rationale">Hex, Torx, Phillips, JIS. Opens absolutely everything you'll encounter — Nucleo screws, servo cases, your kids' broken toys. Lifetime tool.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.ifixit.com/products/mako-driver-kit-64-precision-bits" target="_blank" rel="noopener">iFixit →</a>
+        </div>
+      </div>
+      <div class="part-price">~$35</div>
+    </div>
+
+    <div class="part" data-id="t9" data-cost="15" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Digital Calipers (150mm)</div>
+        <div class="part-rationale">Critical for designing 3D-printed brackets in Month 5. Cheap digital calipers are accurate enough for hobby mechanical work. Battery-included.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1</span>
+          <a href="https://www.amazon.com/s?k=digital+calipers+150mm" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$15</div>
+    </div>
+
+    <div class="part" data-id="t10" data-cost="15" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">22 AWG Hookup Wire Kit (Multi-Color)</div>
+        <div class="part-rationale">Solid core for breadboards. Multi-color matters for keeping power, ground, and signal visually distinct. Color discipline saves debugging time.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1 kit</span>
+          <a href="https://www.amazon.com/s?k=22+AWG+hookup+wire+kit+solid" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$15</div>
+    </div>
+
+    <div class="part" data-id="t11" data-cost="10" data-cat="tools">
+      <div class="part-check"><span class="checkbox"></span></div>
+      <div class="part-body">
+        <div class="part-name">Heat-Shrink Tubing Assortment</div>
+        <div class="part-rationale">For insulating soldered connections cleanly. You'll need this in Month 12 for battery wiring, but cheap insurance to have on hand earlier.</div>
+        <div class="part-meta">
+          <span class="qty">QTY 1 kit</span>
+          <a href="https://www.amazon.com/s?k=heat+shrink+tubing+assortment" target="_blank" rel="noopener">Amazon →</a>
+        </div>
+      </div>
+      <div class="part-price">~$10</div>
+    </div>
+  </section>
+
+  <!-- DEFER LIST -->
+  <section class="defer">
+    <h3>Do NOT buy yet</h3>
+    <ul>
+      <li><strong>USB camera</strong><span class="when">→ MONTH 5</span></li>
+      <li><strong>IMU module</strong> (BNO055 or MPU6050)<span class="when">→ MONTH 5</span></li>
+      <li><strong>Pan-tilt bracket</strong> — you'll likely 3D print<span class="when">→ MONTH 5</span></li>
+      <li><strong>Jetson Orin Nano 8GB Dev Kit</strong><span class="when">→ MONTH 5</span></li>
+      <li><strong>Logic analyzer</strong> (~$15 Saleae clone)<span class="when">→ MONTH 5–6</span></li>
+      <li><strong>4 additional arm servos</strong><span class="when">→ MONTH 9</span></li>
+      <li><strong>OLED display</strong> for eyes<span class="when">→ MONTH 12</span></li>
+      <li><strong>LiPo battery + BMS + voltage regulators</strong><span class="when">→ MONTH 12</span></li>
+    </ul>
+    <p style="font-family: 'IBM Plex Serif', serif; font-style: italic; color: var(--text-dim); font-size: 0.88rem; margin-top: 14px; line-height: 1.55;">You will learn things in Months 1–4 that change what you actually want for Month 5. Buying ahead is buying wrong.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ascii">// — KITTYBOT PROCUREMENT // PHASE 01 — //</div>
+    <div>Last updated: 2026-05-03 · Tap items to mark acquired</div>
+    <div>Lead times: Mouser/DigiKey 1–3 days · Pine Store ~1 week · Amazon Prime 1–2 days</div>
+    <button id="resetBtn" type="button">RESET PROGRESS</button>
+  </footer>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'kittybot:phase-01:parts';
+  const BUDGET = 1500;
+
+  async function loadState() {
+    try {
+      const r = await window.storage.get(STORAGE_KEY);
+      return r ? JSON.parse(r.value) : {};
+    } catch (e) { return {}; }
+  }
+
+  async function saveState(state) {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { console.error('Save failed:', e); }
+  }
+
+  function fmt(n) { return '$' + n.toFixed(0); }
+
+  function recalc() {
+    let hardware = 0, tools = 0;
+    let hwCount = 0, hwTotal = 0;
+    let tlCount = 0, tlTotal = 0;
+
+    document.querySelectorAll('.part').forEach(p => {
+      const cost = parseFloat(p.dataset.cost);
+      const cat = p.dataset.cat;
+      const purchased = p.classList.contains('purchased');
+
+      if (cat === 'hardware') {
+        hwTotal++;
+        if (purchased) { hardware += cost; hwCount++; }
+      } else if (cat === 'tools') {
+        tlTotal++;
+        if (purchased) { tools += cost; tlCount++; }
+      }
+    });
+
+    const total = hardware + tools;
+
+    document.getElementById('totalHardware').textContent = fmt(hardware);
+    document.getElementById('totalTools').textContent = fmt(tools);
+    document.getElementById('totalSpend').textContent = fmt(total);
+    document.getElementById('budgetRemain').textContent = fmt(BUDGET - total);
+    document.getElementById('subHardware').textContent = fmt(hardware);
+    document.getElementById('subTools').textContent = fmt(tools);
+    document.getElementById('hardwareCount').textContent = `${hwCount} of ${hwTotal} acquired`;
+    document.getElementById('toolsCount').textContent = `${tlCount} of ${tlTotal} acquired`;
+  }
+
+  async function init() {
+    const state = await loadState();
+
+    document.querySelectorAll('.part').forEach(part => {
+      const id = part.dataset.id;
+      if (state[id]) part.classList.add('purchased');
+
+      part.querySelector('.part-check').addEventListener('click', async () => {
+        part.classList.toggle('purchased');
+        const current = await loadState();
+        current[id] = part.classList.contains('purchased');
+        await saveState(current);
+        recalc();
+      });
+    });
+
+    recalc();
+
+    document.getElementById('resetBtn').addEventListener('click', async () => {
+      if (!confirm('Reset all purchase tracking?')) return;
+      try { await window.storage.delete(STORAGE_KEY); } catch (e) {}
+      document.querySelectorAll('.part.purchased').forEach(p => p.classList.remove('purchased'));
+      recalc();
+    });
+  }
+
+  init();
+</script>
+
+</body>
+</html>

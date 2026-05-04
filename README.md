@@ -1,274 +1,54 @@
-# kittybot
+# KittyBot
 
-A modular, containerized companion robot head project designed for professional-grade
-software and embedded development practices.
+A C++23 hardware-integrated companion robot platform. Modular runtime, STM32 actuator
+control, OpenCV-based perception, designed to demonstrate end-to-end robotics systems
+engineering.
 
-kittybot is built to evolve from:
-
-* 🧠 Laptop-based development (Nomad)
-* 🖥 Prometheus AI stack integration
-* 🤖 Jetson deployment
-* 🔧 STM32-based actuator control
-
-This project emphasizes:
-
-* Clean architecture
-* Deterministic boundaries
-* Strong commit discipline
-* Unit testing
-* CI enforcement
-* Hardware/software separation of concerns
+> **Status:** Phase 1 / Month 1 — under active construction. Not yet runnable.
 
 ---
 
-# 🚀 Project Vision
+## Project Vision
 
-Final goal:
-A mobile "Hello Kitty"-styled companion robot capable of:
+A battery-powered, untethered companion robot featuring an expressive head with face
+tracking, articulated arms with gesture behaviors, on-board compute, and a hardened
+software stack including binary protocol with CRC, Kalman estimation, simulation with
+deterministic replay, and watchdog-based fault detection.
 
-* Face tracking
-* Conversational interaction
-* Expressive animated eyes
-* Object manipulation (future)
+Year 1 scope is intentionally stationary. Mobile base is a year 2 goal.
 
-Phase 1 (Milestone 1):
-Head Service MVP running fully in software with:
+## Architecture (Target)
 
-* Camera-based face detection
-* PTZ (pan/tilt) target calculation
-* Deterministic state machine
-* Structured logging
-* Prometheus AI integration
-* Transport abstraction (no hardware required yet)
+```
+Camera → Perception (OpenCV)
+       → Behavior FSM
+       → Control (PTZ + arm logic)
+       → Protocol (text now, binary later)
+       → STM32 (PWM + safety + watchdog)
+       → Servos
+       → Telemetry / logs
+```
 
----
+Host compute: NVIDIA Jetson Orin Nano (on-robot)
+MCU: STM32 F446RE (Nucleo dev board)
 
-# 🧱 Architecture Overview
+## Build (Coming Soon)
 
-## High-Level Structure
+The build system isn't wired up yet. Check back at the end of Month 1.
 
-* `head/` → High-level robot head service (Python)
-* `tracking/` → PTZ math and smoothing logic
-* `state/` → Deterministic behavior state machine
-* `vision/` → Camera + perception
-* `transport/` → PTZ/EYES/STATE protocol abstraction
-* `ai/` → Prometheus AI client integration
-* `firmware/` → STM32 embedded firmware (future)
-* `hardware/` → BOM, wiring, CAD (future)
-* `sims/` → Actuator simulators
+## Documents
 
-The head service is fully testable without hardware.
+- `docs/ROADMAP.md` — phased plan, deliverables, risk register
+- `docs/decisions/` — Architecture Decision Records (ADRs)
 
----
+## History
 
-# 📦 Development Workflow
-
-## 1️⃣ Clone the Repository
+The original Python prototype is preserved at the `v0-python-prototype` tag. To browse:
 
 ```bash
-git clone <repo-url>
-cd kittybot
+git checkout v0-python-prototype
 ```
 
-## 2️⃣ Local Development (Fast Loop)
+## License
 
-```bash
-make dev
-```
-
-Service runs locally and exposes:
-
-* `GET /health`
-* `GET /state`
-* `GET /metrics`
-* `GET /deps`
-* `POST /demo/talk`
-
-## 3️⃣ Run Tests
-
-```bash
-make test
-```
-
-With coverage:
-
-```bash
-make test-cov
-```
-
-## 4️⃣ Linting
-
-```bash
-make lint
-```
-
----
-
-# 🐳 Docker Usage
-
-## Development Profile
-
-```bash
-docker compose -f head/docker/compose.dev.yml up
-```
-
-## Server Profile (Prometheus)
-
-```bash
-docker compose -f head/docker/compose.server.yml up
-```
-
-Refer to `docs/dev-runbook.md` for Portainer stack deployment steps.
-
----
-
-# 🔐 Security Model
-
-* API key optional via `API_KEY`
-* If configured, all endpoints except `/health` require header:
-  `X-API-Key`
-* No secrets committed to repository
-* Strict timeout on outbound AI requests
-
----
-
-# 📡 Protocol Contract (Transport Layer)
-
-Newline-delimited text commands.
-
-Units are always **degrees**.
-
-```
-PTZ <yaw_deg> <pitch_deg>
-EYES <mode>
-STATE <state>
-```
-
-Any change to protocol requires an ADR.
-
----
-
-# 🧪 Testing Philosophy
-
-* All core logic must be unit tested
-* Tracking math must be deterministic
-* State transitions must be validated
-* Protocol formatting must be verified
-* CI must pass before merging
-
-Tests live under `head/tests/`.
-
----
-
-# 🌐 Prometheus AI Integration
-
-Head service can call external AI endpoint:
-
-```
-POST {AI_BASE_URL}/chat
-{
-  "text": "...",
-  "session_id": "..."
-}
-```
-
-* Strict timeout
-* Fallback canned response if unavailable
-* `/deps` endpoint shows integration health
-
----
-
-# 🛣 Roadmap
-
-### Milestone 1 — Head Service MVP
-
-* Repo structure
-* Config + logging
-* PTZ math
-* State machine
-* Transport layer
-* Camera + tracking
-* AI client
-
-### Milestone 2 — Simulation Layer
-
-* MCU simulator
-* Eyes simulator
-
-### Milestone 3 — Audio Interaction
-
-* Wake word
-* STT
-* TTS
-
-### Milestone 4 — Hardware Bring-Up
-
-* STM32 firmware
-* Display drivers
-* Servo integration
-
-### Milestone 5 — Jetson Deployment
-
-* Performance tuning
-* Systemd integration
-* GPU acceleration
-
----
-
-# 🧭 Engineering Standards
-
-* Conventional commit format
-* One branch per issue
-* PR required for merge
-* Unit tests required for new logic
-* JSON structured logging
-* YAML runtime configuration
-* PTZ units always degrees
-
-See:
-
-* `CONTRIBUTING.md`
-* `TESTING.md`
-* `REVIEWING.md`
-
----
-
-# 📌 Design Principles
-
-1. Deterministic boundaries
-2. Hardware abstraction
-3. Testable pure logic
-4. Small, scoped changes
-5. No premature optimization
-6. Clean upgrade path to embedded hardware
-
----
-
-# 🧠 Why This Project Exists
-
-kittybot is both:
-
-* A companion robot platform
-* A professional robotics software portfolio project
-
-It is designed to mirror real robotics engineering workflows while
-remaining approachable and modular.
-
----
-
-# ⚠️ Current Status
-
-Early development.
-
-Head service MVP under active construction.
-No hardware required yet.
-
----
-
-# 📜 License
-
-(To be determined)
-
----
-
-End of README
+MIT — see `LICENSE`.

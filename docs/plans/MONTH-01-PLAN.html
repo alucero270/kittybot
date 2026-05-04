@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KittyBot — Month 01 / Foundations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0b;
+    --bg-elevated: #16140f;
+    --bg-card: #1a1814;
+    --grid-line: rgba(232, 159, 76, 0.04);
+    --text: #e8e4da;
+    --text-dim: #9b9486;
+    --text-faint: #5e5950;
+    --amber: #e89f4c;
+    --amber-dim: #b87a35;
+    --signal: #7ab488;
+    --rust: #c45a3d;
+    --line: rgba(232, 228, 218, 0.08);
+    --line-strong: rgba(232, 228, 218, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-weight: 300;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(232, 159, 76, 0.04) 0%, transparent 40%),
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 96px;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .meta-row {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .meta-row .status {
+    color: var(--amber);
+  }
+
+  .meta-row .status::before {
+    content: '●';
+    margin-right: 6px;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+
+  h1 .num {
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  h1 .slash {
+    color: var(--text-faint);
+    margin: 0 0.4em;
+    font-weight: 300;
+  }
+
+  .subtitle {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* ============ MISSION BRIEF ============ */
+  .brief {
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--amber);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .brief-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .brief p {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .brief p + p { margin-top: 12px; }
+
+  .brief strong {
+    color: var(--text);
+    font-weight: 500;
+    background: rgba(232, 159, 76, 0.12);
+    padding: 1px 4px;
+  }
+
+  /* ============ PROGRESS BAR ============ */
+  .progress-section {
+    margin-bottom: 48px;
+  }
+
+  .progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber-dim), var(--amber));
+    width: 0%;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 8px rgba(232, 159, 76, 0.4);
+  }
+
+  .progress-text {
+    color: var(--amber);
+    min-width: 70px;
+    text-align: right;
+    font-weight: 500;
+  }
+
+  /* ============ WEEK CARDS ============ */
+  .week {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    margin-bottom: 28px;
+    transition: border-color 0.2s;
+  }
+
+  .week:hover {
+    border-color: var(--line-strong);
+  }
+
+  .week-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .week-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .week-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .week-status {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.12em;
+  }
+
+  .week-body {
+    padding: 24px;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--amber);
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .why-text {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.65;
+    border-left: 1px solid var(--line-strong);
+    padding-left: 16px;
+  }
+
+  .deliverable {
+    background: var(--bg-elevated);
+    padding: 14px 16px;
+    font-size: 0.92rem;
+    color: var(--text);
+    border-left: 2px solid var(--signal);
+  }
+
+  .deliverable .mono-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--signal);
+    font-size: 0.88em;
+  }
+
+  /* Task list with checkboxes */
+  .task-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    cursor: pointer;
+    transition: opacity 0.15s;
+    user-select: none;
+  }
+
+  .task:last-child { border-bottom: none; }
+
+  .task:hover .checkbox {
+    border-color: var(--amber);
+  }
+
+  .checkbox {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--text-faint);
+    margin-top: 4px;
+    position: relative;
+    transition: all 0.15s;
+  }
+
+  .task.done .checkbox {
+    background: var(--amber);
+    border-color: var(--amber);
+  }
+
+  .task.done .checkbox::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    color: var(--bg);
+    font-weight: 700;
+  }
+
+  .task-text {
+    flex: 1;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .task.done .task-text {
+    color: var(--text-faint);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-faint);
+  }
+
+  .task-text code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em;
+    background: var(--bg);
+    padding: 1px 5px;
+    color: var(--amber);
+    border: 1px solid var(--line);
+  }
+
+  /* Objectives bullets — no checkboxes */
+  .obj-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .obj-list li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    font-size: 0.94rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .obj-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--amber);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .obj-list li code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em;
+    background: var(--bg);
+    padding: 1px 5px;
+    color: var(--amber);
+    border: 1px solid var(--line);
+  }
+
+  /* Connection note */
+  .connection {
+    font-size: 0.86rem;
+    color: var(--text-faint);
+    font-style: italic;
+    padding: 14px 16px;
+    background: rgba(122, 180, 136, 0.04);
+    border: 1px solid rgba(122, 180, 136, 0.15);
+  }
+
+  .connection .mono-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--signal);
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: 0.82em;
+    letter-spacing: 0.08em;
+  }
+
+  /* ============ CROSS-CUTTING ============ */
+  .principles {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .principles h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--amber);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+
+  .principles h2::before {
+    content: '// ';
+    color: var(--text-faint);
+    font-weight: 300;
+  }
+
+  .principle {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .principle:last-child { border-bottom: none; }
+
+  .principle-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .principle-body {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ============ DEFINITION OF DONE ============ */
+  .dod {
+    margin-top: 56px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--amber);
+    padding: 28px;
+    position: relative;
+  }
+
+  .dod::before {
+    content: 'EXIT CRITERIA';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--bg);
+    padding: 0 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.18em;
+  }
+
+  .dod h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .dod ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .dod li {
+    padding: 8px 0 8px 24px;
+    position: relative;
+    font-size: 0.94rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .dod li::before {
+    content: '◆';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    color: var(--amber);
+    font-size: 0.7em;
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+
+  footer .ascii {
+    color: var(--amber-dim);
+    margin-bottom: 12px;
+    white-space: pre;
+    font-size: 10px;
+    overflow-x: auto;
+  }
+
+  footer button {
+    background: transparent;
+    border: 1px solid var(--text-faint);
+    color: var(--text-dim);
+    padding: 6px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.15s;
+  }
+
+  footer button:hover {
+    border-color: var(--rust);
+    color: var(--rust);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 600px) {
+    .container { padding: 20px 16px 64px; }
+    .week-header { padding: 18px 16px 12px; }
+    .week-body { padding: 18px 16px; }
+    .brief { padding: 16px 18px; }
+    .dod { padding: 22px 18px; }
+    h1 { font-size: 1.9rem; }
+    .week-title { font-size: 1.15rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div class="meta-row">
+      <span>KITTYBOT // PHASE 01 // MONTH 01</span>
+      <span class="status">PRE-START · WEEK 00</span>
+    </div>
+    <h1><span class="num">M.01</span><span class="slash">/</span>FOUNDATIONS</h1>
+    <p class="subtitle">Build the foundational classes you'll actually use in Months 2 through 12. Every line of code from this month ships in the final robot.</p>
+  </header>
+
+  <!-- ============ MISSION BRIEF ============ -->
+  <section class="brief">
+    <div class="brief-label">// Mission Brief</div>
+    <p>You haven't written C++ in ten years. Most of that work was Qt, where parent-child trees did your memory management for you. Modern C++ replaces that with <strong>RAII</strong> — and you got the mental model partly inverted in your last answer. This month corrects it through code, not through textbook exercises.</p>
+    <p>By the end of Week 4, you have a working C++23 runtime, a structured logger, a config system, and CI. Months 2–4 plug an STM32 module into <em>this</em> Runtime instead of building everything from zero.</p>
+  </section>
+
+  <!-- ============ PROGRESS ============ -->
+  <section class="progress-section">
+    <div class="progress-bar-wrap">
+      <span class="mono">PROGRESS</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-text mono" id="progressText">0%</span>
+    </div>
+  </section>
+
+  <!-- ============ WEEK 1 ============ -->
+  <article class="week">
+    <div class="week-header">
+      <span class="week-num">W.01</span>
+      <h2 class="week-title">Logger &amp; RAII Fundamentals</h2>
+      <span class="week-status mono">~10 HRS</span>
+    </div>
+    <div class="week-body">
+
+      <div class="section-label">Why this week</div>
+      <p class="why-text">A logger owns a file handle. Cleanup at scope exit isn't optional — it's the whole job. RAII reveals itself most clearly through resources that <em>aren't</em> memory: file handles, mutexes, sockets. Every other module written this year will use this logger. There is no throwaway code.</p>
+
+      <div class="section-label">Learning objectives</div>
+      <ul class="obj-list">
+        <li>Internalize RAII: <em>resource acquisition is initialization, release is destruction</em></li>
+        <li>Understand deterministic destructor timing — scope-bound, not GC-bound</li>
+        <li>Use <code>std::unique_ptr</code> and <code>std::lock_guard</code> as RAII tools, not "STL features"</li>
+        <li>Correct the mental model: <strong>RAII handles cleanup. The STL is one beneficiary, not the source.</strong></li>
+        <li>Understand exception safety basics — what happens to your file if a throw happens mid-write</li>
+      </ul>
+
+      <div class="section-label">Tasks</div>
+      <ul class="task-list" data-week="1">
+        <li class="task" data-id="w1t1"><span class="checkbox"></span><span class="task-text">Set up dev environment: g++ 13+ or clang 16+, CMake 3.20+, debugger</span></li>
+        <li class="task" data-id="w1t2"><span class="checkbox"></span><span class="task-text">Implement <code>kittybot::Logger</code> — file output, owned via RAII</span></li>
+        <li class="task" data-id="w1t3"><span class="checkbox"></span><span class="task-text">Add structured fields: timestamp, level, module name, message</span></li>
+        <li class="task" data-id="w1t4"><span class="checkbox"></span><span class="task-text">Make it thread-safe with <code>std::mutex</code> + <code>std::lock_guard</code></span></li>
+        <li class="task" data-id="w1t5"><span class="checkbox"></span><span class="task-text">Build <code>LogScope</code> RAII helper that logs enter/exit</span></li>
+        <li class="task" data-id="w1t6"><span class="checkbox"></span><span class="task-text">Deliberately throw mid-log inside a <code>LogScope</code>; verify exit still logs</span></li>
+        <li class="task" data-id="w1t7"><span class="checkbox"></span><span class="task-text">Write 3 examples: file-only, stdout-only, both. Use the same Logger class</span></li>
+      </ul>
+
+      <div class="section-label">Deliverable</div>
+      <div class="deliverable">
+        <span class="mono-tag">artifact /</span> A working <code class="mono">kittybot::Logger</code> class that opens a file in its constructor, closes in its destructor, is thread-safe, and provides <code class="mono">LogScope</code> for timing/scope tracking.
+      </div>
+
+      <div class="section-label">Connection forward</div>
+      <div class="connection">
+        <span class="mono-tag">→ Week 2</span> Runtime uses Logger to log module lifecycle. <span class="mono-tag">→ Month 4</span> Serial protocol logs every command sent and ack received. <span class="mono-tag">→ Month 10</span> Simulation harness replays from these exact log files.
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ============ WEEK 2 ============ -->
+  <article class="week">
+    <div class="week-header">
+      <span class="week-num">W.02</span>
+      <h2 class="week-title">Module &amp; Runtime — The Backbone</h2>
+      <span class="week-status mono">~10 HRS</span>
+    </div>
+    <div class="week-body">
+
+      <div class="section-label">Why this week</div>
+      <p class="why-text">Ownership flows downward. A Runtime owns its Modules; when the Runtime dies, all Modules die with it. This is the mental model you got inverted last conversation — fix it here, in code, with a system you'll keep using for 15 months.</p>
+
+      <div class="section-label">Learning objectives</div>
+      <ul class="obj-list">
+        <li>Abstract base classes and pure virtual functions</li>
+        <li><code>std::unique_ptr&lt;Module&gt;</code> — what it owns, when it cleans up</li>
+        <li>Move semantics: why <code>unique_ptr</code> is movable but not copyable</li>
+        <li>Polymorphism through owned base pointers; why heap allocation is necessary</li>
+        <li>Lifecycle composition: <code>init → start → update (loop) → stop</code></li>
+      </ul>
+
+      <div class="section-label">Tasks</div>
+      <ul class="task-list" data-week="2">
+        <li class="task" data-id="w2t1"><span class="checkbox"></span><span class="task-text">Define abstract <code>kittybot::Module</code> with virtual lifecycle methods</span></li>
+        <li class="task" data-id="w2t2"><span class="checkbox"></span><span class="task-text">Implement <code>kittybot::Runtime</code> holding <code>std::vector&lt;std::unique_ptr&lt;Module&gt;&gt;</code></span></li>
+        <li class="task" data-id="w2t3"><span class="checkbox"></span><span class="task-text">Write <code>add_module(std::unique_ptr&lt;Module&gt;)</code> using <code>std::move</code></span></li>
+        <li class="task" data-id="w2t4"><span class="checkbox"></span><span class="task-text">Try to copy a unique_ptr deliberately — read the compiler error, understand it</span></li>
+        <li class="task" data-id="w2t5"><span class="checkbox"></span><span class="task-text">Build <code>HeartbeatModule</code> that logs once per second via the Week 1 Logger</span></li>
+        <li class="task" data-id="w2t6"><span class="checkbox"></span><span class="task-text">Run for 30s, Ctrl-C, verify destructors fire in reverse-add order</span></li>
+        <li class="task" data-id="w2t7"><span class="checkbox"></span><span class="task-text">Answer in your own words: why must Module live on the heap?</span></li>
+      </ul>
+
+      <div class="section-label">Deliverable</div>
+      <div class="deliverable">
+        <span class="mono-tag">artifact /</span> A <code class="mono">Runtime</code> that owns modules via <code class="mono">unique_ptr</code>, calls their lifecycle in order, and shuts down cleanly. One real <code class="mono">HeartbeatModule</code> proves end-to-end.
+      </div>
+
+      <div class="section-label">Connection forward</div>
+      <div class="connection">
+        <span class="mono-tag">→ Month 4</span> Serial protocol becomes a Module. <span class="mono-tag">→ Month 6</span> Perception, BehaviorFSM, Control all become Modules. <span class="mono-tag">→ Month 8</span> Same Runtime ports to Orin Nano.
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ============ WEEK 3 ============ -->
+  <article class="week">
+    <div class="week-header">
+      <span class="week-num">W.03</span>
+      <h2 class="week-title">Configuration &amp; Error Handling</h2>
+      <span class="week-status mono">~10 HRS</span>
+    </div>
+    <div class="week-body">
+
+      <div class="section-label">Why this week</div>
+      <p class="why-text">Hardcoded values are a smell. Every module needs configuration — serial port, log level, Kalman gains, servo limits. Building this now teaches modern error handling (<code>std::optional</code>, <code>std::expected</code>) and avoids you littering the code with magic numbers all year.</p>
+
+      <div class="section-label">Learning objectives</div>
+      <ul class="obj-list">
+        <li><code>std::optional&lt;T&gt;</code> for "value may be absent" semantics</li>
+        <li><code>std::expected&lt;T, E&gt;</code> (C++23) for fallible operations — no exceptions</li>
+        <li>Choosing a config format (JSON via nlohmann/json, or TOML via toml++)</li>
+        <li>Designing for sensible defaults vs. required fields</li>
+        <li>Type-safe lookup: <code>config.get&lt;int&gt;("serial.baudrate")</code></li>
+      </ul>
+
+      <div class="section-label">Tasks</div>
+      <ul class="task-list" data-week="3">
+        <li class="task" data-id="w3t1"><span class="checkbox"></span><span class="task-text">Choose JSON or TOML; write your first ADR explaining why</span></li>
+        <li class="task" data-id="w3t2"><span class="checkbox"></span><span class="task-text">Add the parser library to CMake (FetchContent or vcpkg)</span></li>
+        <li class="task" data-id="w3t3"><span class="checkbox"></span><span class="task-text">Implement <code>Config::load(path) -&gt; std::expected&lt;Config, ConfigError&gt;</code></span></li>
+        <li class="task" data-id="w3t4"><span class="checkbox"></span><span class="task-text">Add type-safe <code>get&lt;T&gt;</code> with default value overload</span></li>
+        <li class="task" data-id="w3t5"><span class="checkbox"></span><span class="task-text">Wire log level into Logger from config; observe runtime change</span></li>
+        <li class="task" data-id="w3t6"><span class="checkbox"></span><span class="task-text">Make Runtime read which modules to start from config</span></li>
+        <li class="task" data-id="w3t7"><span class="checkbox"></span><span class="task-text">Test failure modes: missing file, malformed file, missing required field</span></li>
+      </ul>
+
+      <div class="section-label">Deliverable</div>
+      <div class="deliverable">
+        <span class="mono-tag">artifact /</span> A <code class="mono">Config</code> that loads from disk, returns clear errors via <code class="mono">std::expected</code>, supports defaults, and is wired into Logger and Runtime.
+      </div>
+
+      <div class="section-label">Connection forward</div>
+      <div class="connection">
+        <span class="mono-tag">→ Month 7</span> Kalman tuning constants live in config. <span class="mono-tag">→ Month 11</span> Servo limits and trajectory parameters in config. <span class="mono-tag">→ Always</span> Tuning without recompiling.
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ============ WEEK 4 ============ -->
+  <article class="week">
+    <div class="week-header">
+      <span class="week-num">W.04</span>
+      <h2 class="week-title">Project Hygiene — CMake, Tests, CI</h2>
+      <span class="week-status mono">~10 HRS</span>
+    </div>
+    <div class="week-body">
+
+      <div class="section-label">Why this week</div>
+      <p class="why-text">This is what separates hobby code from professional code. A hiring manager opens your repo, types <code>cmake --build</code>, and either it works or it doesn't. CI green is a credibility signal. Tests prove your reasoning. ADRs prove you can think.</p>
+
+      <div class="section-label">Learning objectives</div>
+      <ul class="obj-list">
+        <li>Idiomatic CMake project layout: <code>src/</code>, <code>include/</code>, <code>tests/</code>, <code>docs/</code></li>
+        <li>Unit testing with Catch2 or GoogleTest</li>
+        <li>GitHub Actions: build matrix, test runs, status badge</li>
+        <li><code>clang-format</code> with project style file; pre-commit hooks</li>
+        <li>Architecture Decision Records — short, dated, in the repo</li>
+      </ul>
+
+      <div class="section-label">Tasks</div>
+      <ul class="task-list" data-week="4">
+        <li class="task" data-id="w4t1"><span class="checkbox"></span><span class="task-text">Restructure repo: <code>src/</code>, <code>include/kittybot/</code>, <code>tests/</code>, <code>docs/decisions/</code></span></li>
+        <li class="task" data-id="w4t2"><span class="checkbox"></span><span class="task-text">Add Catch2 or GoogleTest; one test file per module</span></li>
+        <li class="task" data-id="w4t3"><span class="checkbox"></span><span class="task-text">Test Logger format output, Runtime lifecycle order, Config parse errors</span></li>
+        <li class="task" data-id="w4t4"><span class="checkbox"></span><span class="task-text">Set up GitHub Actions: build + test on every push to main</span></li>
+        <li class="task" data-id="w4t5"><span class="checkbox"></span><span class="task-text">Add <code>.clang-format</code>; commit hook to enforce</span></li>
+        <li class="task" data-id="w4t6"><span class="checkbox"></span><span class="task-text">Write ADR-0001 (directory layout), ADR-0002 (JSON vs TOML), ADR-0003 (test framework)</span></li>
+        <li class="task" data-id="w4t7"><span class="checkbox"></span><span class="task-text">Write a README a stranger could clone and build from</span></li>
+        <li class="task" data-id="w4t8"><span class="checkbox"></span><span class="task-text">Update <code>ROADMAP.md</code> — mark Phase 1 Month 1 complete</span></li>
+      </ul>
+
+      <div class="section-label">Deliverable</div>
+      <div class="deliverable">
+        <span class="mono-tag">artifact /</span> A repo a stranger could clone, build, test, and run. CI green. Format enforced. Three ADRs written. README that doesn't lie.
+      </div>
+
+      <div class="section-label">Connection forward</div>
+      <div class="connection">
+        <span class="mono-tag">→ Month 12</span> When the demo video gets cut, the architecture writeup pulls from your ADR log. <span class="mono-tag">→ Interview</span> "Walk me through your decision-making" — point to <code>docs/decisions/</code>.
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ============ CROSS-CUTTING PRINCIPLES ============ -->
+  <section class="principles">
+    <h2>Cross-cutting discipline</h2>
+
+    <div class="principle">
+      <div class="principle-title">No raw new / delete</div>
+      <div class="principle-body">If you type <code>new</code>, it's wrapped in a smart pointer immediately. If you type <code>delete</code>, you're doing something wrong. There are exceptions, but you shouldn't hit one in Month 1.</div>
+    </div>
+
+    <div class="principle">
+      <div class="principle-title">Owners are obvious</div>
+      <div class="principle-body">For every resource — memory, file, mutex, socket — one place owns it. That place is responsible for cleanup. If you can't point to the owner in five seconds, the design is wrong.</div>
+    </div>
+
+    <div class="principle">
+      <div class="principle-title">Commit small, commit often</div>
+      <div class="principle-body">A commit per task is fine. Build commit message hygiene from day one. <code>feat(logger): add LogScope helper</code> beats <code>updates</code>.</div>
+    </div>
+
+    <div class="principle">
+      <div class="principle-title">Read the compiler error</div>
+      <div class="principle-body">Modern C++ compiler errors are dense but precise. Read them line by line. The error you ignore in Week 1 is the one you don't understand in Month 7. The "try to copy unique_ptr" exercise is deliberately there to make you read one.</div>
+    </div>
+
+    <div class="principle">
+      <div class="principle-title">Document decisions, not code</div>
+      <div class="principle-body">Code comments explain <em>why</em>, not <em>what</em>. ADRs capture trade-offs that aren't obvious from the code. Both compound in value.</div>
+    </div>
+
+  </section>
+
+  <!-- ============ DEFINITION OF DONE ============ -->
+  <section class="dod">
+    <h2>Month 1 is complete when:</h2>
+    <ul>
+      <li>Repo builds cleanly with <code class="mono">cmake -S . -B build &amp;&amp; cmake --build build</code></li>
+      <li>All tests pass: <code class="mono">ctest --test-dir build</code></li>
+      <li>CI is green on <code class="mono">main</code></li>
+      <li>Logger, Runtime, and Config classes exist, are tested, and are used together in a runnable demo</li>
+      <li>You can explain RAII and ownership in your own words — and your explanation matches reality</li>
+      <li>Three ADRs are written and committed</li>
+      <li>README is honest: someone else could follow it</li>
+      <li><code class="mono">ROADMAP.md</code> is updated; Phase 1 Month 1 is marked complete</li>
+    </ul>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="ascii">// — KITTYBOT ENGINEERING LOG — //</div>
+    <div>Last updated: 2026-05-03 · Phase 01 / Month 01 · Foundations</div>
+    <div>Update protocol: edit in place, commit as <code style="font-family:'IBM Plex Mono',monospace;color:var(--amber)">docs(plan): &lt;change&gt;</code></div>
+    <button id="resetBtn" type="button">RESET PROGRESS</button>
+  </footer>
+
+</div>
+
+<script>
+  // ============ TASK PERSISTENCE ============
+  const STORAGE_KEY = 'kittybot:month-01:tasks';
+
+  async function loadState() {
+    try {
+      const result = await window.storage.get(STORAGE_KEY);
+      return result ? JSON.parse(result.value) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  async function saveState(state) {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error('Save failed:', e);
+    }
+  }
+
+  function updateProgress() {
+    const tasks = document.querySelectorAll('.task');
+    const done = document.querySelectorAll('.task.done');
+    const pct = tasks.length === 0 ? 0 : Math.round((done.length / tasks.length) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '%';
+  }
+
+  async function init() {
+    const state = await loadState();
+
+    document.querySelectorAll('.task').forEach(task => {
+      const id = task.dataset.id;
+      if (state[id]) {
+        task.classList.add('done');
+      }
+
+      task.addEventListener('click', async () => {
+        task.classList.toggle('done');
+        const current = await loadState();
+        current[task.dataset.id] = task.classList.contains('done');
+        await saveState(current);
+        updateProgress();
+      });
+    });
+
+    updateProgress();
+
+    document.getElementById('resetBtn').addEventListener('click', async () => {
+      if (!confirm('Reset all task progress for Month 01?')) return;
+      try {
+        await window.storage.delete(STORAGE_KEY);
+      } catch (e) { /* ignore */ }
+      document.querySelectorAll('.task.done').forEach(t => t.classList.remove('done'));
+      updateProgress();
+    });
+  }
+
+  init();
+</script>
+
+</body>
+</html>

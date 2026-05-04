@@ -1,1 +1,0 @@
-"""kittybot head package."""

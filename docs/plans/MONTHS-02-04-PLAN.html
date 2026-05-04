@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KittyBot — Months 02–04 / Foundations Continued</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0b;
+    --bg-elevated: #16140f;
+    --bg-card: #1a1814;
+    --grid-line: rgba(232, 159, 76, 0.04);
+    --text: #e8e4da;
+    --text-dim: #9b9486;
+    --text-faint: #5e5950;
+    --amber: #e89f4c;
+    --amber-dim: #b87a35;
+    --signal: #7ab488;
+    --rust: #c45a3d;
+    --line: rgba(232, 228, 218, 0.08);
+    --line-strong: rgba(232, 228, 218, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-weight: 300;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(232, 159, 76, 0.04) 0%, transparent 40%),
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 24px 96px;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 28px;
+    margin-bottom: 36px;
+  }
+  .meta-row {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .meta-row .status { color: var(--amber); }
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(1.9rem, 5.5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  h1 .num { color: var(--amber); font-weight: 600; }
+  h1 .slash { color: var(--text-faint); margin: 0 0.4em; font-weight: 300; }
+  .subtitle {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-dim);
+    max-width: 660px;
+    line-height: 1.6;
+  }
+
+  /* GRANULARITY NOTE */
+  .granularity {
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--rust);
+    padding: 16px 20px;
+    margin-bottom: 36px;
+  }
+  .granularity .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .granularity p {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+  .granularity p strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    margin-bottom: 28px;
+  }
+  .timeline-track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--line);
+    background: var(--line);
+  }
+  .timeline-cell {
+    background: var(--bg-elevated);
+    padding: 14px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .timeline-cell:hover { background: var(--bg-card); }
+  .timeline-cell.active { background: var(--bg); }
+  .timeline-cell.active .tc-month { color: var(--amber); }
+  .timeline-cell.complete .tc-month { color: var(--signal); }
+  .tc-month {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .tc-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.84rem;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  /* MONTH CARDS */
+  .month {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    margin-bottom: 32px;
+    transition: border-color 0.2s;
+  }
+  .month:hover { border-color: var(--line-strong); }
+
+  .month-header {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .month-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .month-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .month-hours {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+    margin-left: auto;
+  }
+  .month-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .month-tagline {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+
+  .month-body {
+    padding: 24px 28px;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--amber);
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* MILESTONES */
+  .milestones {
+    list-style: none;
+    padding: 0;
+  }
+  .milestones li {
+    padding: 10px 0 10px 22px;
+    position: relative;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    border-bottom: 1px dashed var(--line);
+  }
+  .milestones li:last-child { border-bottom: none; }
+  .milestones li::before {
+    content: '◇';
+    position: absolute;
+    left: 2px;
+    top: 11px;
+    color: var(--amber);
+    font-size: 0.85em;
+  }
+  .milestones li code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86em;
+    background: var(--bg);
+    padding: 1px 5px;
+    color: var(--amber);
+    border: 1px solid var(--line);
+  }
+
+  /* ACCEPTANCE CRITERIA */
+  .acceptance {
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--signal);
+    padding: 16px 20px;
+  }
+  .acceptance ul {
+    list-style: none;
+    padding: 0;
+  }
+  .acceptance li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .acceptance li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--signal);
+    font-weight: 700;
+  }
+  .acceptance li code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86em;
+    background: var(--bg);
+    padding: 1px 5px;
+    color: var(--amber);
+    border: 1px solid var(--line);
+  }
+
+  /* RISKS */
+  .risk-list {
+    list-style: none;
+    padding: 0;
+  }
+  .risk {
+    padding: 12px 16px;
+    background: rgba(196, 90, 61, 0.06);
+    border: 1px solid rgba(196, 90, 61, 0.2);
+    margin-bottom: 8px;
+  }
+  .risk-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--rust);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .risk-mitigation {
+    font-family: 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* CONNECTIONS */
+  .connections {
+    background: rgba(122, 180, 136, 0.04);
+    border: 1px solid rgba(122, 180, 136, 0.15);
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .connections .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--signal);
+    text-transform: uppercase;
+    font-size: 0.82em;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+
+  /* DEPENDENCIES */
+  .deps {
+    list-style: none;
+    padding: 0;
+  }
+  .deps li {
+    padding: 8px 0 8px 20px;
+    position: relative;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .deps li::before {
+    content: '⟶';
+    position: absolute;
+    left: 0;
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .deps li strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* FINAL CHECKPOINT */
+  .checkpoint {
+    margin-top: 48px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--amber);
+    padding: 28px 32px;
+    position: relative;
+  }
+  .checkpoint::before {
+    content: 'PHASE 01 EXIT GATE';
+    position: absolute;
+    top: -10px;
+    left: 24px;
+    background: var(--bg);
+    padding: 0 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.18em;
+  }
+  .checkpoint h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .checkpoint p {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 0.96rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+  .checkpoint ul {
+    list-style: none;
+    padding: 0;
+  }
+  .checkpoint li {
+    padding: 8px 0 8px 24px;
+    position: relative;
+    font-size: 0.94rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .checkpoint li::before {
+    content: '◆';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    color: var(--amber);
+    font-size: 0.7em;
+  }
+  .checkpoint li code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86em;
+    background: var(--bg);
+    padding: 1px 5px;
+    color: var(--amber);
+    border: 1px solid var(--line);
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+  footer .ascii {
+    color: var(--amber-dim);
+    margin-bottom: 12px;
+    font-size: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px 16px 64px; }
+    .month-header, .month-body { padding-left: 18px; padding-right: 18px; }
+    .checkpoint { padding: 24px 18px; }
+    .timeline-track { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 1.7rem; }
+    .month-title { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="meta-row">
+      <span>KITTYBOT // PHASE 01 // MONTHS 02–04</span>
+      <span class="status">PLAN · MILESTONE GRANULARITY</span>
+    </div>
+    <h1><span class="num">M.02–04</span><span class="slash">/</span>FOUNDATIONS·CONT.</h1>
+    <p class="subtitle">From a working desktop runtime to a servo moving from a typed command. STM32 toolchain, hardware bring-up, and the host↔board bridge that becomes the architectural backbone of everything that follows.</p>
+  </header>
+
+  <!-- GRANULARITY NOTE -->
+  <section class="granularity">
+    <div class="label">// On planning granularity</div>
+    <p>This plan is <strong>milestone-level, not week-level</strong>. Months 1's reality will reshape Month 2's tasks — maybe RAII clicks fast and we accelerate, maybe CMake fights you for a week. Week-by-week tasks for each month get added in the last week of the prior month, when we have the information to write them well. Premature task lists feel productive but lock in plans we'll rewrite anyway.</p>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline">
+    <div class="timeline-track">
+      <div class="timeline-cell">
+        <div class="tc-month">M.01</div>
+        <div class="tc-title">Runtime &amp; C++<br>(complete)</div>
+      </div>
+      <div class="timeline-cell active">
+        <div class="tc-month">M.02</div>
+        <div class="tc-title">STM32<br>toolchain</div>
+      </div>
+      <div class="timeline-cell active">
+        <div class="tc-month">M.03</div>
+        <div class="tc-title">First<br>servo</div>
+      </div>
+      <div class="timeline-cell active">
+        <div class="tc-month">M.04</div>
+        <div class="tc-title">Host↔STM32<br>bridge</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MONTH 2 -->
+  <article class="month">
+    <div class="month-header">
+      <div class="month-meta">
+        <span class="month-num">M.02 // STM32 TOOLCHAIN</span>
+        <span class="month-hours">~40 HRS</span>
+      </div>
+      <h2 class="month-title">Bring up the embedded toolchain</h2>
+      <p class="month-tagline">Stop being a desktop programmer. Become someone who can flash a microcontroller and watch its UART speak.</p>
+    </div>
+    <div class="month-body">
+
+      <div class="section-label">Dependencies in</div>
+      <ul class="deps">
+        <li><strong>Hardware on hand</strong> — Nucleo-F446RE, USB cable, multimeter, LED + resistor for blink</li>
+        <li><strong>Month 1 complete</strong> — runtime skeleton exists; Logger and Module patterns understood</li>
+      </ul>
+
+      <div class="section-label">Milestones</div>
+      <ul class="milestones">
+        <li><strong>Toolchain installed and verified.</strong> PlatformIO + VS Code on Windows. CubeMX as a separate generator tool. Empty project compiles and reports the F446RE chip correctly.</li>
+        <li><strong>Blink, the right way.</strong> Not Arduino-style. Configure the GPIO peripheral via HAL or LL, with explicit clock setup. Understand <em>why</em> the LED blinks — clock tree, peripheral enable, pin mode, set/reset register.</li>
+        <li><strong>UART echo working.</strong> Type characters into a serial terminal on Windows; see them echoed back from the Nucleo. Use <code>printf</code> retargeted to UART for log output. Verify baud rate, parity, stop bits explicitly.</li>
+        <li><strong>Button input with debounce.</strong> External button on a GPIO pin. Read it cleanly — debounced, either via timer-based polling or interrupt with software debounce. <em>Now</em> you understand interrupts.</li>
+        <li><strong>First debugger session.</strong> Set a breakpoint, step through code, inspect register values. ST-Link-V2-1 over USB, no separate hardware needed.</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <div class="acceptance">
+        <ul>
+          <li>You can flash firmware via <code>pio run -t upload</code></li>
+          <li>You can open a serial monitor and see your firmware's log output</li>
+          <li>You can set a breakpoint, hit it, and read variable values in the debugger</li>
+          <li>You wrote an ADR explaining HAL vs LL choice for this project</li>
+          <li>You can answer: <em>"What is the clock tree, and why did I have to configure it?"</em></li>
+        </ul>
+      </div>
+
+      <div class="section-label">Risks &amp; how we'll handle them</div>
+      <ul class="risk-list">
+        <li class="risk">
+          <div class="risk-name">// USB driver issues on Windows</div>
+          <div class="risk-mitigation">ST-Link drivers can be flaky on first install. If the Nucleo doesn't enumerate, install ST's ST-Link USB driver manually before troubleshooting code. Half a day max — escalate if longer.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// CubeMX-generated code feels alien</div>
+          <div class="risk-mitigation">Generated init code is dense. Don't try to read it all at once — focus on what each peripheral's <code>HAL_*_Init</code> does. The reference manual is your friend.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// "Blink works, now what" plateau</div>
+          <div class="risk-mitigation">Resist Arduino-style "let me just glue tutorials together." Push to UART because that's where real debugging starts.</div>
+        </li>
+      </ul>
+
+      <div class="section-label">What you'll learn</div>
+      <div class="connections">
+        <span class="tag">CONCEPT</span>Memory-mapped peripherals · clock trees · interrupts vs polling · debouncing · serial protocols · debugger workflow · the difference between "code that compiles" and "code that runs on hardware."
+      </div>
+
+    </div>
+  </article>
+
+  <!-- MONTH 3 -->
+  <article class="month">
+    <div class="month-header">
+      <div class="month-meta">
+        <span class="month-num">M.03 // FIRST SERVO</span>
+        <span class="month-hours">~40 HRS</span>
+      </div>
+      <h2 class="month-title">Make a thing in the physical world move</h2>
+      <p class="month-tagline">PWM, timer peripherals, and the first real safety lesson — current. Power discipline starts here.</p>
+    </div>
+    <div class="month-body">
+
+      <div class="section-label">Dependencies in</div>
+      <ul class="deps">
+        <li><strong>Month 2 complete</strong> — UART, GPIO, debugger workflow are familiar</li>
+        <li><strong>Bench setup ready</strong> — separate 5V power supply, common ground with Nucleo, multimeter accessible</li>
+        <li><strong>2× MG90S servos</strong> — buy two, expect to burn one</li>
+      </ul>
+
+      <div class="section-label">Milestones</div>
+      <ul class="milestones">
+        <li><strong>PWM peripheral configured.</strong> Timer in PWM mode, 50 Hz frequency, 1–2 ms pulse width range. Understand: <em>what is the timer counting, and what does the duty cycle physically mean for the servo?</em></li>
+        <li><strong>Servo sweeps cleanly under firmware control.</strong> 0° to 180° and back. Smooth, no jitter, no chatter. The mechanical motion matches the commanded position.</li>
+        <li><strong>Power discipline verified.</strong> Servo runs from external 5V supply, not from the Nucleo's 5V pin. Common ground confirmed with multimeter. Current draw measured.</li>
+        <li><strong>Position-from-UART command.</strong> Type an angle into the serial terminal; servo moves to that angle. Bare-metal, no host runtime yet — just a parser inside the STM32 firmware.</li>
+        <li><strong>Hardware safety limits in firmware.</strong> Reject invalid angles. Implement min/max bounds. Add a "kill" command that snaps to a known safe position.</li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <div class="acceptance">
+        <ul>
+          <li>Type <code>90</code> in the terminal → servo moves to 90°. Type <code>0</code> → moves to 0°. Type <code>999</code> → rejected with error log, servo doesn't move.</li>
+          <li>You measured the servo's actual current draw under load with the multimeter</li>
+          <li>You can explain why the servo would brown out the MCU if powered from the Nucleo's 5V pin</li>
+          <li>ADR written: PWM frequency choice, angle-to-pulse mapping, safety limit values</li>
+        </ul>
+      </div>
+
+      <div class="section-label">Risks &amp; how we'll handle them</div>
+      <ul class="risk-list">
+        <li class="risk">
+          <div class="risk-name">// Servo jitters or chatters</div>
+          <div class="risk-mitigation">Usually a power issue (insufficient supply, shared ground problem) or PWM frequency mismatch. Multimeter the supply voltage <em>under load</em>, not idle. If it sags below 4.8V, supply is undersized.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// Servo dies (you burn one out)</div>
+          <div class="risk-mitigation">This is the expected outcome — you bought two on purpose. Common cause: shorting the signal pin to power, or stalling the servo against a hard mechanical limit. Diagnose <em>why</em> before swapping in the spare.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// "It moves but I don't understand why"</div>
+          <div class="risk-mitigation">Don't accept this. Write the ADR explaining angle-to-pulse mapping. If you can't write it, you don't understand it yet — that's the time to slow down, not push forward.</div>
+        </li>
+      </ul>
+
+      <div class="section-label">What you'll learn</div>
+      <div class="connections">
+        <span class="tag">CONCEPT</span>Timer peripherals in PWM mode · servo control signaling (1–2ms pulse) · current draw and power discipline · bench measurement workflow · firmware-level safety limits · the gap between commanded and actual position (preview of Month 7's Kalman work).
+      </div>
+
+    </div>
+  </article>
+
+  <!-- MONTH 4 -->
+  <article class="month">
+    <div class="month-header">
+      <div class="month-meta">
+        <span class="month-num">M.04 // HOST↔STM32 BRIDGE</span>
+        <span class="month-hours">~40 HRS</span>
+      </div>
+      <h2 class="month-title">Connect the runtime to the hardware</h2>
+      <p class="month-tagline">A SerialModule plugs into the Runtime built in Month 1. Everything you build for the next year flows through this protocol.</p>
+    </div>
+    <div class="month-body">
+
+      <div class="section-label">Dependencies in</div>
+      <ul class="deps">
+        <li><strong>Month 1 Runtime + Logger + Config</strong> — the C++ scaffolding</li>
+        <li><strong>Month 3 servo working</strong> — the firmware target</li>
+        <li><strong>Text protocol contract</strong> — pulled forward from the v0 prototype's good thinking</li>
+      </ul>
+
+      <div class="section-label">Milestones</div>
+      <ul class="milestones">
+        <li><strong>Text protocol specified in an ADR.</strong> Format like <code>PTZ &lt;yaw&gt; &lt;pitch&gt;</code>, <code>STATE &lt;name&gt;</code>, newline-delimited. Units are explicit (degrees). Document what happens on malformed input.</li>
+        <li><strong>SerialPort wrapper class on host.</strong> Cross-platform serial I/O (libserialport, Boost.Asio, or hand-rolled). RAII over the file descriptor. Non-blocking reads. Errors via <code>std::expected</code>.</li>
+        <li><strong>SerialModule integrated into Runtime.</strong> A real <code>kittybot::Module</code> that opens the port on init, reads incoming lines on update, sends outbound commands. This proves the Month 1 architecture works for non-trivial modules.</li>
+        <li><strong>STM32 firmware parses the text protocol.</strong> Receives commands, dispatches to servo, sends ack/nack responses. Logs malformed input. The board becomes a well-behaved peripheral, not a free-form REPL.</li>
+        <li><strong>End-to-end demo.</strong> Run the host runtime, type <code>PTZ 30 0</code>, watch the servo move to 30°. Both sides log the transaction. ACK comes back. <em>This is your first real distributed system.</em></li>
+      </ul>
+
+      <div class="section-label">Acceptance criteria</div>
+      <div class="acceptance">
+        <ul>
+          <li><code>./kittybot --config configs/dev.json</code> starts the runtime, opens the serial port, idles cleanly</li>
+          <li>An interactive command (or test harness) sends <code>PTZ 30 0</code>; servo moves; ACK is logged</li>
+          <li>Disconnecting the USB cable mid-session produces a clear error, not a crash. Reconnecting recovers.</li>
+          <li>Tests cover: protocol parsing on the host, protocol formatting on the firmware, malformed-input handling on both sides</li>
+          <li>CI green. README updated with the protocol description and a working demo command.</li>
+        </ul>
+      </div>
+
+      <div class="section-label">Risks &amp; how we'll handle them</div>
+      <ul class="risk-list">
+        <li class="risk">
+          <div class="risk-name">// Serial port permissions / COM enumeration</div>
+          <div class="risk-mitigation">Windows COM port numbers shift; the same Nucleo can be COM3 today and COM7 tomorrow. Make the port configurable; auto-detect via VID/PID is a Month-12 polish item, not now.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// Buffer / framing bugs</div>
+          <div class="risk-mitigation">Newline-delimited text is forgiving but not free. Partial reads are real. Test deliberately: send half a command, wait, send the rest. Your parser should handle it.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// Cross-platform serial library churn</div>
+          <div class="risk-mitigation">Pick libserialport or Boost.Asio early; don't rewrite mid-month. Document the choice in ADR. We can swap in Month 9 when binary protocol arrives if needed.</div>
+        </li>
+        <li class="risk">
+          <div class="risk-name">// Scope creep into "should I make this binary now?"</div>
+          <div class="risk-mitigation">No. Text protocol stays through Month 8. Binary in Month 9 is a deliberate decision after you've earned the complexity. Note the ADR explicitly rejects binary for now.</div>
+        </li>
+      </ul>
+
+      <div class="section-label">What you'll learn</div>
+      <div class="connections">
+        <span class="tag">CONCEPT</span>Cross-platform serial I/O · protocol design (framing, units, error responses) · the host↔firmware boundary · graceful failure modes · integration testing across two codebases · the architectural backbone that survives into Month 12.
+      </div>
+
+    </div>
+  </article>
+
+  <!-- PHASE 1 EXIT GATE -->
+  <section class="checkpoint">
+    <h2>Phase 01 is complete when:</h2>
+    <p>End of Month 4. This is the gate before vision work starts. Don't move on until every item below is true.</p>
+    <ul>
+      <li>Repo structure is professional: <code>src/</code>, <code>include/kittybot/</code>, <code>firmware/</code>, <code>tests/</code>, <code>docs/decisions/</code></li>
+      <li>Host runtime builds with <code>cmake --build</code> on Linux/WSL2; firmware builds with <code>pio run</code> on Windows</li>
+      <li>CI is green on every push; tests pass; clang-format is enforced</li>
+      <li><strong>End-to-end demo:</strong> typing <code>PTZ &lt;angle&gt;</code> moves a real servo, with logs on both ends and an ACK</li>
+      <li>You can explain the architecture (Runtime, Module, Logger, Config, SerialModule, firmware protocol parser) without notes</li>
+      <li>At least 6 ADRs exist covering: directory layout, JSON-vs-TOML, test framework, HAL-vs-LL, PWM frequency &amp; safety limits, text protocol design</li>
+      <li>README is honest — a stranger could clone, build, flash, and run the demo</li>
+      <li><code>ROADMAP.md</code> updated; Phase 1 marked complete; risk register revised based on what you actually learned</li>
+      <li>You've ordered Month 5 hardware (camera, IMU, Orin Nano, pan-tilt parts) so it arrives during Month 5's first week</li>
+    </ul>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ascii">// — KITTYBOT ENGINEERING LOG // PHASE 01 // MONTHS 02–04 — //</div>
+    <div>Last updated: 2026-05-03 · Milestone-level granularity · Week tasks added end of prior month</div>
+    <div>Update protocol: revise as Months 1–3 reality lands; commit as <span style="color:var(--amber)">docs(plan): &lt;change&gt;</span></div>
+  </footer>
+
+</div>
+
+</body>
+</html>
