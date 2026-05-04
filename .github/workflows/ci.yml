@@ -49,7 +49,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          files=$(find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | grep -v build/)
+          files=$(find . \( -name "*.cpp" -o -name "*.hpp" -o -name "*.h" \) -not -path '*/build/*')
           if [ -z "$files" ]; then
             echo "No C++ source files found — skipping format check."
             exit 0
