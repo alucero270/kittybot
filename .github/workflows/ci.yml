@@ -7,27 +7,51 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build:
+    name: Build & Test (C++23)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install
+      - name: Install toolchain
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build gcc-13 g++-13
 
-      - name: Lint
+      - name: Configure
         run: |
-          make lint
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_CXX_COMPILER=g++-13 \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_TESTING=ON
+
+      - name: Build
+        run: cmake --build build
 
       - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  format:
+    name: clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clang-format
         run: |
-          make test
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Check formatting
+        run: |
+          files=$(find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | grep -v build/)
+          if [ -z "$files" ]; then
+            echo "No C++ source files found — skipping format check."
+            exit 0
+          fi
+          echo "$files" | xargs clang-format --dry-run --Werror

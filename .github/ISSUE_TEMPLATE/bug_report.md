@@ -31,8 +31,8 @@ What happens now? Include logs/errors.
 
 ## Environment
 - OS:
-- Docker version:
-- Python version:
+- Compiler (e.g. g++-13, clang-17):
+- CMake version:
 - Commit hash (if known):
 
 ## Scope
@@ -40,7 +40,7 @@ Files/areas likely involved.
 
 ## Acceptance Criteria
 - [ ] Bug fixed and repro no longer fails
-- [ ] `make test` passes
+- [ ] CI passes (`build` + `format` jobs green)
 - [ ] Regression test added (if appropriate)
 - [ ] Docs updated if behavior changed
 
