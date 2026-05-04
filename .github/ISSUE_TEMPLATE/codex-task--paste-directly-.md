@@ -15,18 +15,15 @@ labels: ["codex"]
 assignees: []
 ---
 
-## Paste into Codex (include wrapper)
-1) Paste `docs/codex-prompt-wrapper.md`
-2) Paste the task below
-
 ## Task Summary
 -
 
 ## Files in Scope (ONLY these may be modified/created)
-- 
+-
 
 ## Requirements
 -
 
 ## Acceptance Criteria
-- [ ]
+- [ ] CI passes (`build` + `format` jobs green)
+- [ ] 

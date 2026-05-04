@@ -26,16 +26,14 @@ What must NOT be done in this issue (prevents Codex drift).
 - Do not ...
 
 ## Technical Requirements
-- Language/runtime: Python 3.11 (head) / C (STM32 later)
-- Config: YAML (`config.yaml`) if needed
-- Logging: JSON structured logs
-- Security: respect API key rules (X-API-Key) if touching HTTP
-- Transport: PTZ/EYES/STATE protocol and degrees units if touching transport
-- Tests: pytest required for new logic
+- Language/runtime: C++23 (host) / C (STM32 firmware)
+- Logging: `kittybot::Logger` for structured output
+- Transport: PTZ/EYES/STATE protocol, units always degrees
+- Tests: Catch2 unit tests required for new logic modules
 
 ## Acceptance Criteria
 - [ ] Implements only the scope described above
-- [ ] `make test` passes
+- [ ] CI passes (`build` + `format` jobs green)
 - [ ] Unit tests added/updated for new logic
 - [ ] Documentation updated (READMEs + relevant docs)
 - [ ] No secrets committed (no tokens/keys in repo)
