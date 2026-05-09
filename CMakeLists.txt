@@ -23,3 +23,23 @@ endif()
 
 # Modules added here as they're built (Month 1+)
 # add_subdirectory(src)
+add_library(kittybot
+        src/kittybot/version.cpp
+        src/kittybot/logger.cpp
+)
+
+target_include_directories(kittybot
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+add_executable(test_logger
+        tests/test_logger.cpp
+)
+
+target_link_libraries(test_logger
+        PRIVATE
+        kittybot
+)
+
+add_test(NAME logger_test COMMAND test_logger)
