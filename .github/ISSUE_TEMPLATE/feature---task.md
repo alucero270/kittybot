@@ -1,28 +1,26 @@
 ---
 name: Feature / Task
-about: A scoped task with acceptance criteria
-title: "[feat]<scope>: <short title>"
+about: A scoped task with clear acceptance criteria
+title: "[feat](<scope>): <short title>"
 labels: enhancement
 assignees: alucero270
-
 ---
 
 ## Summary
-Describe what we are building in 1–3 sentences.
+<!-- Describe what we're building in 1–3 sentences. -->
 
 ## Context
-Why this exists (architecture, phase, dependency). Link to related issues/ADRs if any.
+<!-- Why this exists: architecture, phase, dependency. Link related issues/ADRs. -->
 
 ## Scope
-What should be implemented. Be explicit about modules/files.
-- File(s) to create/modify:
+<!-- What must be implemented. Be explicit about modules/files. -->
+- Files to create/modify:
   - `...`
 - Behaviors to add/change:
   - ...
 
 ## Non-Goals
-What must NOT be done in this issue (prevents Codex drift).
-- Do not ...
+<!-- What must NOT be done in this issue. -->
 - Do not ...
 
 ## Technical Requirements
@@ -35,8 +33,8 @@ What must NOT be done in this issue (prevents Codex drift).
 - [ ] Implements only the scope described above
 - [ ] CI passes (`build` + `format` jobs green)
 - [ ] Unit tests added/updated for new logic
-- [ ] Documentation updated (READMEs + relevant docs)
-- [ ] No secrets committed (no tokens/keys in repo)
+- [ ] Docs updated (READMEs + relevant docs)
+- [ ] No secrets committed
 
-## Notes for Codex
-Paste any specific constraints, pseudo-code, or examples here.
+## Agent Notes
+<!-- Constraints, pseudo-code, "do not touch" areas, or implementation hints. -->

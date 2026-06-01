@@ -1,48 +1,39 @@
 ---
-name: Bug report
-about: A reproducible bug report
-title: "[BUG]<scope>: <short title>"
+name: Bug Report
+about: A reproducible bug that needs fixing
+title: "[bug](<scope>): <short title>"
 labels: bug
 assignees: alucero270
-
----
-
----
-name: "Bug (Codex-ready)"
-about: "A reproducible bug report Codex can fix"
-title: "[kittybot][bug] <short title>"
-labels: ["bug"]
-assignees: []
 ---
 
 ## Summary
-What is broken?
+<!-- What is broken? One clear sentence. -->
 
 ## Steps to Reproduce
-1.
-2.
-3.
+1. 
+2. 
+3. 
 
 ## Expected Behavior
-What should happen?
+<!-- What should happen. -->
 
 ## Actual Behavior
-What happens now? Include logs/errors.
+<!-- What happens now. Include logs/stack traces. -->
 
 ## Environment
 - OS:
 - Compiler (e.g. g++-13, clang-17):
 - CMake version:
-- Commit hash (if known):
+- Commit hash:
 
 ## Scope
-Files/areas likely involved.
+<!-- Files/areas likely involved. -->
 
 ## Acceptance Criteria
-- [ ] Bug fixed and repro no longer fails
+- [ ] Bug no longer reproduces
 - [ ] CI passes (`build` + `format` jobs green)
 - [ ] Regression test added (if appropriate)
 - [ ] Docs updated if behavior changed
 
-## Notes for Codex
-Any hints, constraints, or “do not touch” areas.
+## Agent Notes
+<!-- Constraints, hints, or "do not touch" areas. -->
